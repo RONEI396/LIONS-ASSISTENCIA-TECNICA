@@ -37,7 +37,7 @@
 <div class="container" id="paginaProduto" style="display:none;"></div>
 
 <script>
-const baseURL = "https://ronei396.github.io/LIONS-ASSISTENCIA-TECNICA/";
+const baseURL = window.location.origin + window.location.pathname;
 
 function gerarLink(){
   const nome = encodeURIComponent(document.getElementById('nome').value);
@@ -49,7 +49,7 @@ function gerarLink(){
 
   const link = `${baseURL}?nome=${nome}&preco=${preco}&esp=${esp}&status=${status}`;
 
-  QRCode.toCanvas(document.getElementById('qr'), link);
+  QRCode.toCanvas(document.getElementById('qr'), link.trim());
 }
 
 function carregarProduto(){
@@ -80,4 +80,6 @@ carregarProduto();
 
 </body>
 </html>
+
+
 
