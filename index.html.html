@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lions ASTC-Loja</title>
+  <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+</head>
+<body style="font-family: Arial; background:#f4f4f4; padding:20px;">
+
+<h1 style="text-align:center;">Lions ASTC-Loja</h1>
+
+<div style="max-width:600px; margin:auto; background:white; padding:20px; border-radius:10px;">
+  <h3>Cadastrar Novo PC</h3>
+  <input id="nome" placeholder="Nome do PC" style="width:100%; margin-bottom:10px;">
+  <input id="preco" placeholder="Preço (R$)" style="width:100%; margin-bottom:10px;">
+  <textarea id="especificacoes" placeholder="Especificações" style="width:100%; margin-bottom:10px;"></textarea>
+  <button onclick="gerarQR()" style="width:100%; padding:10px; background:black; color:white;">Gerar QR Code</button>
+
+  <canvas id="qr" style="margin-top:20px;"></canvas>
+</div>
+
+<script>
+function gerarQR(){
+  const nome = document.getElementById("nome").value;
+  const preco = document.getElementById("preco").value;
+  const esp = document.getElementById("especificacoes").value;
+
+  const texto = `Lions ASTC-Loja\n\n${nome}\nPreço: R$ ${preco}\n\n${esp}`;
+
+  QRCode.toCanvas(document.getElementById("qr"), texto);
+}
+</script>
+
+</body>
+</html>
