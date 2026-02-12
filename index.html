@@ -1,91 +1,90 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Lions ASTC-Loja</title>
-  <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
-  <style>
-    body { font-family: Arial, sans-serif; background:#f4f4f4; margin:0; padding:20px; }
-    .container { max-width:900px; margin:auto; }
-    .card { background:white; padding:20px; border-radius:12px; box-shadow:0 4px 10px rgba(0,0,0,0.1); margin-bottom:20px; }
-    input, textarea, select, button { width:100%; padding:10px; margin:8px 0; border-radius:8px; border:1px solid #ccc; }
-    button { background:black; color:white; cursor:pointer; }
-    .badge { display:inline-block; padding:5px 10px; border-radius:20px; background:#eaeaea; font-size:12px; }
-    img { max-width:100%; border-radius:12px; margin-bottom:10px; }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lions ASTC-Loja</title>
+<script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+<style>
+body{font-family:Arial,Helvetica,sans-serif;background:#f2f2f2;margin:0;padding:20px}
+.container{max-width:900px;margin:auto}
+.card{background:#fff;padding:25px;border-radius:14px;box-shadow:0 6px 18px rgba(0,0,0,0.08);margin-bottom:25px}
+h1{margin-bottom:25px}
+input,textarea,select,button{width:100%;padding:12px;margin:8px 0;border-radius:8px;border:1px solid #ccc;font-size:14px}
+button{background:#000;color:#fff;font-weight:bold;cursor:pointer}
+button:hover{opacity:.9}
+.badge{display:inline-block;padding:6px 12px;border-radius:20px;background:#eee;font-size:12px;margin-top:8px}
+img{max-width:100%;border-radius:12px;margin:15px 0}
+canvas{margin-top:15px}
+.small{font-size:12px;color:#666;margin-top:-5px}
+</style>
 </head>
 <body>
 
 <div class="container" id="painel">
-  <h1>Lions ASTC-Loja</h1>
+<h1>Lions ASTC-Loja</h1>
 
-  <div class="card">
-    <h3>Cadastrar Novo PC</h3>
-    <input type="text" id="nome" placeholder="Nome do PC">
-    <input type="text" id="preco" placeholder="Preço (R$)">
-    <textarea id="especificacoes" placeholder="Especificações completas"></textarea>
-    <select id="status">
-      <option>Disponível</option>
-      <option>Vendido</option>
-    </select>
-    <input type="file" id="imagem" accept="image/*">
-    <button onclick="gerarLink()">Gerar Link + QR Code</button>
-    <canvas id="qr" style="margin-top:15px;"></canvas>
-  </div>
+<div class="card">
+<h3>Cadastrar Novo PC</h3>
+<input type="text" id="nome" placeholder="Nome do PC">
+<input type="text" id="preco" placeholder="Preço (R$)">
+<textarea id="especificacoes" placeholder="Especificações completas"></textarea>
+<select id="status">
+<option>Disponível</option>
+<option>Vendido</option>
+</select>
+<input type="text" id="imagem" placeholder="Nome da imagem (ex: pc1.jpg)">
+<div class="small">A imagem deve estar dentro da pasta /imagens no repositório</div>
+<button onclick="gerarLink()">Gerar Link + QR Code</button>
+<canvas id="qr"></canvas>
+</div>
 </div>
 
-<div class="container" id="paginaProduto" style="display:none;"></div>
+<div class="container" id="produto" style="display:none"></div>
 
 <script>
 const baseURL = window.location.origin + window.location.pathname;
 
 function gerarLink(){
-  const nome = encodeURIComponent(document.getElementById('nome').value);
-  const preco = encodeURIComponent(document.getElementById('preco').value);
-  const esp = encodeURIComponent(document.getElementById('especificacoes').value);
-  const status = encodeURIComponent(document.getElementById('status').value);
-  const imagemInput = document.getElementById('imagem');
+const nome = encodeURIComponent(document.getElementById('nome').value.trim());
+const preco = encodeURIComponent(document.getElementById('preco').value.trim());
+const esp = encodeURIComponent(document.getElementById('especificacoes').value.trim());
+const status = encodeURIComponent(document.getElementById('status').value);
+const img = encodeURIComponent(document.getElementById('imagem').value.trim());
 
-  if(!nome || !preco){ alert("Preencha nome e preço"); return; }
+if(!nome || !preco){
+alert("Preencha nome e preço");
+return;
+}
 
-  if(imagemInput.files[0]){
-    const reader = new FileReader();
-    reader.onload = function(e){
-      const imagemBase64 = encodeURIComponent(e.target.result);
-      const link = `${baseURL}?nome=${nome}&preco=${preco}&esp=${esp}&status=${status}&img=${imagemBase64}`;
-      QRCode.toCanvas(document.getElementById('qr'), link.trim());
-    }
-    reader.readAsDataURL(imagemInput.files[0]);
-  } else {
-    const link = `${baseURL}?nome=${nome}&preco=${preco}&esp=${esp}&status=${status}`;
-    QRCode.toCanvas(document.getElementById('qr'), link.trim());
-  }
+const link = `${baseURL}?nome=${nome}&preco=${preco}&esp=${esp}&status=${status}&img=${img}`;
+
+QRCode.toCanvas(document.getElementById('qr'), link);
 }
 
 function carregarProduto(){
-  const params = new URLSearchParams(window.location.search);
-  const nome = params.get("nome");
+const params = new URLSearchParams(window.location.search);
+const nome = params.get("nome");
 
-  if(nome){
-    document.getElementById("painel").style.display = "none";
-    const preco = params.get("preco");
-    const esp = params.get("esp");
-    const status = params.get("status");
-    const img = params.get("img");
+if(nome){
+document.getElementById("painel").style.display = "none";
+const preco = params.get("preco");
+const esp = params.get("esp");
+const status = params.get("status");
+const img = params.get("img");
 
-    const div = document.getElementById("paginaProduto");
-    div.style.display = "block";
-    div.innerHTML = `
-      <div class="card">
-        <h2>${decodeURIComponent(nome)}</h2>
-        ${img ? `<img src="${decodeURIComponent(img)}">` : ''}
-        <h3>R$ ${decodeURIComponent(preco)}</h3>
-        <span class="badge">${decodeURIComponent(status)}</span>
-        <p style="white-space: pre-line; margin-top:15px;">${decodeURIComponent(esp)}</p>
-      </div>
-    `;
-  }
+const div = document.getElementById("produto");
+div.style.display = "block";
+div.innerHTML = `
+<div class="card">
+<h2>${decodeURIComponent(nome)}</h2>
+${img ? `<img src="imagens/${decodeURIComponent(img)}" alt="Imagem do Produto">` : ''}
+<h3>R$ ${decodeURIComponent(preco)}</h3>
+<span class="badge">${decodeURIComponent(status)}</span>
+<p style="white-space:pre-line;margin-top:15px">${decodeURIComponent(esp)}</p>
+</div>
+`;
+}
 }
 
 carregarProduto();
@@ -93,7 +92,5 @@ carregarProduto();
 
 </body>
 </html>
-
-
 
 
