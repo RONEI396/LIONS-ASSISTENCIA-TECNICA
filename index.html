@@ -29,6 +29,7 @@
       <option>Disponível</option>
       <option>Vendido</option>
     </select>
+    <input type="file" id="imagem" accept="image/*">
     <button onclick="gerarLink()">Gerar Link + QR Code</button>
     <canvas id="qr" style="margin-top:15px;"></canvas>
   </div>
@@ -44,12 +45,22 @@ function gerarLink(){
   const preco = encodeURIComponent(document.getElementById('preco').value);
   const esp = encodeURIComponent(document.getElementById('especificacoes').value);
   const status = encodeURIComponent(document.getElementById('status').value);
+  const imagemInput = document.getElementById('imagem');
 
   if(!nome || !preco){ alert("Preencha nome e preço"); return; }
 
-  const link = `${baseURL}?nome=${nome}&preco=${preco}&esp=${esp}&status=${status}`;
-
-  QRCode.toCanvas(document.getElementById('qr'), link.trim());
+  if(imagemInput.files[0]){
+    const reader = new FileReader();
+    reader.onload = function(e){
+      const imagemBase64 = encodeURIComponent(e.target.result);
+      const link = `${baseURL}?nome=${nome}&preco=${preco}&esp=${esp}&status=${status}&img=${imagemBase64}`;
+      QRCode.toCanvas(document.getElementById('qr'), link.trim());
+    }
+    reader.readAsDataURL(imagemInput.files[0]);
+  } else {
+    const link = `${baseURL}?nome=${nome}&preco=${preco}&esp=${esp}&status=${status}`;
+    QRCode.toCanvas(document.getElementById('qr'), link.trim());
+  }
 }
 
 function carregarProduto(){
@@ -61,12 +72,14 @@ function carregarProduto(){
     const preco = params.get("preco");
     const esp = params.get("esp");
     const status = params.get("status");
+    const img = params.get("img");
 
     const div = document.getElementById("paginaProduto");
     div.style.display = "block";
     div.innerHTML = `
       <div class="card">
         <h2>${decodeURIComponent(nome)}</h2>
+        ${img ? `<img src="${decodeURIComponent(img)}">` : ''}
         <h3>R$ ${decodeURIComponent(preco)}</h3>
         <span class="badge">${decodeURIComponent(status)}</span>
         <p style="white-space: pre-line; margin-top:15px;">${decodeURIComponent(esp)}</p>
@@ -80,6 +93,7 @@ carregarProduto();
 
 </body>
 </html>
+
 
 
 
