@@ -5,32 +5,79 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Lions ASTC-Loja</title>
   <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+  <style>
+    body { font-family: Arial, sans-serif; background:#f4f4f4; margin:0; padding:20px; }
+    .container { max-width:900px; margin:auto; }
+    .card { background:white; padding:20px; border-radius:12px; box-shadow:0 4px 10px rgba(0,0,0,0.1); margin-bottom:20px; }
+    input, textarea, select, button { width:100%; padding:10px; margin:8px 0; border-radius:8px; border:1px solid #ccc; }
+    button { background:black; color:white; cursor:pointer; }
+    .badge { display:inline-block; padding:5px 10px; border-radius:20px; background:#eaeaea; font-size:12px; }
+    img { max-width:100%; border-radius:12px; margin-bottom:10px; }
+  </style>
 </head>
-<body style="font-family: Arial; background:#f4f4f4; padding:20px;">
+<body>
 
-<h1 style="text-align:center;">Lions ASTC-Loja</h1>
+<div class="container" id="painel">
+  <h1>Lions ASTC-Loja</h1>
 
-<div style="max-width:600px; margin:auto; background:white; padding:20px; border-radius:10px;">
-  <h3>Cadastrar Novo PC</h3>
-  <input id="nome" placeholder="Nome do PC" style="width:100%; margin-bottom:10px;">
-  <input id="preco" placeholder="Preço (R$)" style="width:100%; margin-bottom:10px;">
-  <textarea id="especificacoes" placeholder="Especificações" style="width:100%; margin-bottom:10px;"></textarea>
-  <button onclick="gerarQR()" style="width:100%; padding:10px; background:black; color:white;">Gerar QR Code</button>
-
-  <canvas id="qr" style="margin-top:20px;"></canvas>
+  <div class="card">
+    <h3>Cadastrar Novo PC</h3>
+    <input type="text" id="nome" placeholder="Nome do PC">
+    <input type="text" id="preco" placeholder="Preço (R$)">
+    <textarea id="especificacoes" placeholder="Especificações completas"></textarea>
+    <select id="status">
+      <option>Disponível</option>
+      <option>Vendido</option>
+    </select>
+    <button onclick="gerarLink()">Gerar Link + QR Code</button>
+    <canvas id="qr" style="margin-top:15px;"></canvas>
+  </div>
 </div>
 
+<div class="container" id="paginaProduto" style="display:none;"></div>
+
 <script>
-function gerarQR(){
-  const nome = document.getElementById("nome").value;
-  const preco = document.getElementById("preco").value;
-  const esp = document.getElementById("especificacoes").value;
+const baseURL = "https://ronei396.github.io/LIONS-ASSISTENCIA-TECNICA/";
 
-  const texto = `Lions ASTC-Loja\n\n${nome}\nPreço: R$ ${preco}\n\n${esp}`;
+function gerarLink(){
+  const nome = encodeURIComponent(document.getElementById('nome').value);
+  const preco = encodeURIComponent(document.getElementById('preco').value);
+  const esp = encodeURIComponent(document.getElementById('especificacoes').value);
+  const status = encodeURIComponent(document.getElementById('status').value);
 
-  QRCode.toCanvas(document.getElementById("qr"), texto);
+  if(!nome || !preco){ alert("Preencha nome e preço"); return; }
+
+  const link = `${baseURL}?nome=${nome}&preco=${preco}&esp=${esp}&status=${status}`;
+
+  QRCode.toCanvas(document.getElementById('qr'), link);
 }
+
+function carregarProduto(){
+  const params = new URLSearchParams(window.location.search);
+  const nome = params.get("nome");
+
+  if(nome){
+    document.getElementById("painel").style.display = "none";
+    const preco = params.get("preco");
+    const esp = params.get("esp");
+    const status = params.get("status");
+
+    const div = document.getElementById("paginaProduto");
+    div.style.display = "block";
+    div.innerHTML = `
+      <div class="card">
+        <h2>${decodeURIComponent(nome)}</h2>
+        <h3>R$ ${decodeURIComponent(preco)}</h3>
+        <span class="badge">${decodeURIComponent(status)}</span>
+        <p style="white-space: pre-line; margin-top:15px;">${decodeURIComponent(esp)}</p>
+      </div>
+    `;
+  }
+}
+
+carregarProduto();
 </script>
 
 </body>
 </html>
+
